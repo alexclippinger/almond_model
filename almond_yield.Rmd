@@ -1,0 +1,18 @@
+---
+title: "Almond Yield Model"
+author: "Almond Group C"
+date: "4/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+```{r load_data}
+# added ID column title
+clim <- read_delim("./clim.txt", delim=" ")
+```
+
