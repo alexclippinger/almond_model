@@ -9,10 +9,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(knitr)
+source('yield_model.R')
 ```
 
-```{r load_data}
-# added ID column title
+```{r load_data, message = FALSE}
+# Read in climate data
 clim <- read_delim("./clim.txt", delim=" ")
 ```
+
+```{r model_yield}
+model_results <- yield_model(clim)
+kable(model_results)
+```
+
 
