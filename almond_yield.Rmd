@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(knitr)
+library(kableExtra)
+
 source('yield_model.R')
 ```
 
@@ -18,9 +20,27 @@ source('yield_model.R')
 clim <- read_delim("./clim.txt", delim=" ")
 ```
 
-```{r model_yield}
+```{r model_yield_table}
 model_results <- yield_model(clim)
-kable(model_results)
+
+kable(model_results %>% 
+        rename(Year = year, "Almond Yield Anomaly (ton/acre)" = almond_yield), 
+      digits=4,
+      caption = "Modeled Almond Yield Anomaly 1989-2010",
+      format = "html",
+      table.attr = "style='width:50%;'") %>% 
+  kable_classic() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                position = "left")
 ```
 
+```{r model_yield_plot, warning = FALSE}
+ggplot(data = model_results, aes(x = year, y = almond_yield)) +
+  geom_line() +
+  geom_point() +
+  theme_light() +
+  labs(x = "Year",
+       y = "Almond Yield Anomaly (ton/acre)",
+       title = "Modeled Almond Yield Anomaly 1989-2010")
+```
 

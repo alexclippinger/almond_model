@@ -8,7 +8,7 @@ library(roxygen2)
 #'
 #' @return A data frame of modeled yields for each year
 yield_model <- function(clim, year_start = min(clim$year), year_end = max(clim$year)) {
-  # Build return dataframe
+  # Build return data frame
   columns <- c("year", "almond_yield")
   yield_results <- data.frame(matrix(nrow = 0, ncol = length(columns)))
   colnames(yield_results) <- columns
@@ -54,5 +54,5 @@ almond_yield_for_year <- function(clim, yr) {
 
   # Almond yield equation, Lobell et. al. 2006
   yield = -0.015*(min_T_feb) - 0.0046*((min_T_feb)^2) - 0.07*(precip_jan) + 0.0043*((precip_jan)^2) + 0.28
-  yield  # TODO: Should values < 0 just return 0 instead?
+  yield  
 }
