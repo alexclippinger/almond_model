@@ -1,7 +1,5 @@
 ---
-title: "Almond Yield Model"
-author: "Almond Group C"
-date: "4/10/2022"
+title: "Almond Yield Model, Group C"
 output: html_document
 ---
 
@@ -13,6 +11,7 @@ library(knitr)
 library(kableExtra)
 
 source('yield_model.R')
+options(knitr.table.format = "latex") 
 ```
 
 ```{r load_data, message = FALSE}
@@ -31,7 +30,8 @@ kable(model_results %>%
       table.attr = "style='width:50%;'") %>% 
   kable_classic() %>% 
   kable_styling(bootstrap_options = c("striped", "hover"),
-                position = "left")
+                position = "left"
+                )
 ```
 
 ```{r model_yield_plot, warning = FALSE}
@@ -44,3 +44,30 @@ ggplot(data = model_results, aes(x = year, y = almond_yield)) +
        title = "Modeled Almond Yield Anomaly 1989-2010")
 ```
 
+```{r}
+rain <- clim %>% 
+  group_by(year) %>% 
+  summarize(sum_precip = sum(precip))
+
+rain_yield <- full_join(model_results, rain)
+
+ggplot(data = rain, aes(x = year, y = sum_precip)) + 
+  geom_line() +
+  geom_point() +
+  theme_light() 
+  
+```
+
+```{r}
+linear_model <- lm(data = rain_yield, almond_yield ~ sum_precip)
+
+summary.lm(linear_model)
+
+
+ggplot(data = rain_yield, aes(x = sum_precip, 
+                              y = almond_yield)) +
+    geom_smooth(method = "lm")
+```
+
+
+Our findings demonstrate four years of almond yields below the anomaly (1989, 1999, 2003, 2004). Noticeable spikes in almond yield occur in 1995, 2005 and 2008. There seems to be a general pattern regarding consecutive years of yields slightly above/below the anomaly with on year spikes occurring every few years. By plotting annual precipitation, we see a similar pattern in the data, with high rainfall generally correlating with high almond yields. The linear regression also supports the correlation.
