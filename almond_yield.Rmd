@@ -3,6 +3,8 @@ title: "Almond Yield Model, Group C"
 output: html_document
 ---
 
+# Setup
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -11,6 +13,7 @@ library(knitr)
 library(kableExtra)
 
 source('yield_model.R')
+source('profit_model.R')
 options(knitr.table.format = "latex") 
 ```
 
@@ -18,6 +21,8 @@ options(knitr.table.format = "latex")
 # Read in climate data
 clim <- read_delim("./clim.txt", delim=" ")
 ```
+
+# Compute Yield
 
 ```{r model_yield_table}
 model_results <- yield_model(clim)
@@ -34,6 +39,8 @@ kable(model_results %>%
                 )
 ```
 
+# Visualize Yield
+
 ```{r model_yield_plot, warning = FALSE}
 ggplot(data = model_results, aes(x = year, y = almond_yield)) +
   geom_line() +
@@ -43,6 +50,8 @@ ggplot(data = model_results, aes(x = year, y = almond_yield)) +
        y = "Almond Yield Anomaly (ton/acre)",
        title = "Modeled Almond Yield Anomaly 1989-2010")
 ```
+
+# Additional Exploration
 
 ```{r}
 rain <- clim %>% 
@@ -69,5 +78,11 @@ ggplot(data = rain_yield, aes(x = sum_precip,
     geom_smooth(method = "lm")
 ```
 
-
 Our findings demonstrate four years of almond yields below the anomaly (1989, 1999, 2003, 2004). Noticeable spikes in almond yield occur in 1995, 2005 and 2008. There seems to be a general pattern regarding consecutive years of yields slightly above/below the anomaly with on year spikes occurring every few years. By plotting annual precipitation, we see a similar pattern in the data, with high rainfall generally correlating with high almond yields. The linear regression also supports the correlation.
+
+# Compute Profit
+
+```{r}
+profit <- profit_model(yield_results = model_results, price =  10)
+```
+
