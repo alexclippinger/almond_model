@@ -90,6 +90,18 @@ Our findings demonstrate four years of almond yields below the anomaly (1989, 19
 
 ```{r}
 profit <- profit_model(yield_results = model_results, price =  10)
+
+p1 = ggplot(profit, aes(x=year, y=profit)) +
+  geom_line() +
+  theme_light() +
+  labs(y="Profit", x="Year")
+
+p2 = ggplot(profit, aes(x=year, y=almond_yield)) +
+  geom_line() +
+  theme_light() +
+  labs(y="Almond Yield", x="Year")
+
+ggarrange(p1, p2)
 ```
 
 # Simple Informal Sensitivity Analysis
@@ -100,20 +112,21 @@ profit <- profit_model(yield_results = model_results, price =  10)
 
 ```{r}
 nsamples = 50
-deviation = 0.1
-base_temp = -0.015
-base_precip = -0.07
+deviation = 0.001
+base_temp = -0.0046
+base_precip = 0.0043
 
 # Create normal distributions of both parameters 
-temp_param = rnorm(mean = base_temp, sd = deviation, n = nsamples)
-precip_param = rnorm(mean = base_precip, sd = deviation, n = nsamples)
+temp_param2 = rnorm(mean = base_temp, sd = deviation, n = nsamples)
+precip_param2 = rnorm(mean = base_precip, sd = deviation, n = nsamples)
 
 # Combine into data frame
-params = cbind.data.frame(temp_param, precip_param)
+params = cbind.data.frame(temp_param2, precip_param2)
 
 # Run yield model on all parameter combinations
-results = params %>% pmap(yield_model, 
-                          clim=clim)
+results = params %>% pmap(yield_model, clim=clim,
+                          temp_param=-0.015, precip_param=-0.07, intercept=0.28,
+                          year_start=min(clim$year), year_end=max(clim$year))
 
 # Extract results
 mean_yield = map_df(results, `[`, c("almond_yield"))
@@ -121,18 +134,26 @@ mean_yield = cbind.data.frame(mean_yield, params)
 
 # Plot results
 p1 = ggplot(mean_yield, 
-            aes(temp_param, almond_yield, col=precip_param)) +
+            aes(temp_param2, almond_yield, col=precip_param2)) +
   geom_point(cex=2) +
+  theme_light() +
   labs(y="Mean Annual Almond_Yield", 
        x="Temperature Coefficient")
 
 p2 = ggplot(mean_yield, 
-            aes(precip_param, almond_yield, col=temp_param)) + 
+            aes(precip_param2, almond_yield, col=temp_param2)) + 
   geom_point(cex=2) +
+  theme_light() +
   labs(y="Mean Annual Almond Yield", 
        x="Precipitation Coefficient")
 
 ggarrange(p1, p2)
 ```
 
+```{r}
+# Investigate parameter space
+ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
+  geom_point() +
+  theme_light()
+```
 
