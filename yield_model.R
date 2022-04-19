@@ -7,7 +7,12 @@ library(roxygen2)
 #' @param year_end The year to end modeling on, defaults to last year of data
 #'
 #' @return A data frame of modeled yields for each year
-yield_model <- function(clim, year_start = min(clim$year), year_end = max(clim$year)) {
+yield_model <- function(clim, 
+                        temp_param = -0.015, 
+                        precip_param = -0.07,
+                        year_start = min(clim$year), 
+                        year_end = max(clim$year)) {
+  
   # Build return data frame
   columns <- c("year", "almond_yield")
   yield_results <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -17,13 +22,26 @@ yield_model <- function(clim, year_start = min(clim$year), year_end = max(clim$y
   span = seq(year_start, year_end, 1)
 
   # Iterate over each year of desired span
-  for (year in span) {
+  for (yr in span) {
+    
+    # Get average minimum temperature from Feb of current year
+    min_T_feb = clim %>% 
+      filter(year == yr, month == 2) %>% 
+      summarize(min_T_feb = mean(tmin_c)) %>% 
+      pull()
+    
+    # Get total precipitation from Jan of current year
+    precip_jan = clim %>% 
+      filter(year == yr, month == 1) %>% 
+      summarize(precip_jan = sum(precip)) %>% 
+      pull()
+    
     # Get almond yield for year
-    almond_yield <- almond_yield_for_year(clim, year)
-
+    almond_yield = temp_param*(min_T_feb) - 0.0046*((min_T_feb)^2) + precip_param*(precip_jan) + 0.0043*((precip_jan)^2) + 0.28
+  
     # Add results to return dataframe
     yield_results <- yield_results %>% add_row(
-      year = year,
+      year = yr,
       almond_yield = almond_yield
     )
   }
@@ -31,28 +49,3 @@ yield_model <- function(clim, year_start = min(clim$year), year_end = max(clim$y
   yield_results
 }
 
-#' almond_yield_for_year, Model almond yield for given year
-#'
-#' @param clim The data frame of pre-formatted climate data
-#' @param yr The year of data to calculate yield for
-#'
-#' @return The calculated yield of almonds
-almond_yield_for_year <- function(clim, yr) {
-  # Filter data to year
-  year_data <- clim %>% filter(year == yr)
-
-  # Return NA for year with no data
-  if (nrow(year_data) == 0) {
-    return(NA)
-  }
-
-  # Average minimum temps from Feb of current year
-  min_T_feb <- mean((year_data %>% filter(month == 2) %>% select(tmin_c))$tmin_c)
-
-  # Total precipitation from Jan of current year
-  precip_jan <- sum(year_data %>% filter(month == 1) %>% select(precip))
-
-  # Almond yield equation, Lobell et. al. 2006
-  yield = -0.015*(min_T_feb) - 0.0046*((min_T_feb)^2) - 0.07*(precip_jan) + 0.0043*((precip_jan)^2) + 0.28
-  yield  
-}
