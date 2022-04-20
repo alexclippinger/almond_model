@@ -25,7 +25,9 @@ options(knitr.table.format = "latex",
 clim <- read_delim("./clim.txt", delim=" ")
 ```
 
-# Compute Yield
+# Assignment 2 - Almond Yield Function
+
+## Compute Yield
 
 ```{r model_yield_table}
 model_results <- yield_model(clim)
@@ -42,7 +44,7 @@ kable(model_results %>%
                 )
 ```
 
-# Visualize Yield
+## Visualize Yield
 
 ```{r model_yield_plot, warning = FALSE}
 ggplot(data = model_results, aes(x = year, y = almond_yield)) +
@@ -54,7 +56,7 @@ ggplot(data = model_results, aes(x = year, y = almond_yield)) +
        title = "Modeled Almond Yield Anomaly 1989-2010")
 ```
 
-# Additional Exploration
+## Additional Exploration
 
 ```{r}
 rain <- clim %>% 
@@ -86,7 +88,9 @@ ggplot(data = rain_yield, aes(x = sum_precip, y = almond_yield)) +
 
 Our findings demonstrate four years of almond yields below the anomaly (1989, 1999, 2003, 2004). Noticeable spikes in almond yield occur in 1995, 2005 and 2008. There seems to be a general pattern regarding consecutive years of yields slightly above/below the anomaly with on year spikes occurring every few years. By plotting annual precipitation, we see a similar pattern in the data, with high rainfall generally correlating with high almond yields. The linear regression also supports the correlation.
 
-# Compute Profit
+# Assignment 3 - Almond Profit Sensitivity
+
+## Compute Simple Profit Model
 
 ```{r}
 profit <- profit_model(yield_results = model_results, price =  10)
@@ -104,11 +108,11 @@ p2 = ggplot(profit, aes(x=year, y=almond_yield)) +
 ggarrange(p1, p2)
 ```
 
-# Simple Informal Sensitivity Analysis
+## Simple Informal Sensitivity Analysis
 
-* Assume +-15% uncertainty in *temp_param* and *precip_param* parameters, using a uniform distribution
+* Assume uncertainty in *temp_param2* and *precip_param2* parameters
 
-* Default values from the function are -0.015 and -0.07, respectively
+* Default values from the function are -0.0046 and 0.0043, respectively
 
 ```{r}
 nsamples = 50
@@ -154,6 +158,42 @@ ggarrange(p1, p2)
 # Investigate parameter space
 ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
   geom_point() +
-  theme_light()
+  theme_light() +
+  labs(x="Temperature Coefficient",
+       y="Precipitation Coefficient",
+       title="Visualization of Parameter Sets")
+```
+
+## Almond Profit Uncertainty
+
+```{r}
+profit_sensitivity <- profit_model(yield_results = mean_yield, price = 10)
+
+# Plot results
+p1 = ggplot(profit_sensitivity, 
+            aes(temp_param2, profit, col=precip_param2)) +
+  geom_point(cex=2) +
+  theme_light() +
+  labs(y="Profit", 
+       x="Temperature Coefficient")
+
+p2 = ggplot(profit_sensitivity, 
+            aes(precip_param2, profit, col=temp_param2)) + 
+  geom_point(cex=2) +
+  theme_light() +
+  labs(y="Profit", 
+       x="Precipitation Coefficient")
+
+ggarrange(p1, p2)
+
+```
+
+```{r}
+ggplot(profit_sensitivity, aes(x=profit, y=almond_yield)) +
+  geom_point() +
+  theme_light() +
+  labs(x="Profit", 
+       y="Almond Yield",
+       title="Relationship Between Profit and Almond Yield")
 ```
 
