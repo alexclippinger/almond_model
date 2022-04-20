@@ -189,11 +189,11 @@ ggarrange(p1, p2)
 ```
 
 ```{r}
-ggplot(profit_sensitivity, aes(x=profit, y=almond_yield)) +
+ggplot(profit_sensitivity, aes(x=almond_yield, y=profit)) +
   geom_point() +
   theme_light() +
-  labs(x="Profit", 
-       y="Almond Yield",
+  labs(x="Almond Yield", 
+       y="Profit",
        title="Relationship Between Profit and Almond Yield")
 ```
 
