@@ -133,7 +133,7 @@ results = params %>% pmap(yield_model, clim=clim,
                           year_start=min(clim$year), year_end=max(clim$year))
 
 # Extract results
-mean_yield = map_df(results, `[`, c("almond_yield"))
+mean_yield = map_df(results, `[`, c("year", "almond_yield"))
 mean_yield = cbind.data.frame(mean_yield, params)
 
 # Plot results
@@ -170,22 +170,21 @@ ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
 profit_sensitivity <- profit_model(yield_results = mean_yield)
 
 # Plot results
-p1 = ggplot(profit_sensitivity, 
-            aes(temp_param2, profit, col=precip_param2)) +
-  geom_point(cex=2) +
-  theme_light() +
-  labs(y="Profit", 
-       x="Temperature Coefficient")
-
-p2 = ggplot(profit_sensitivity, 
-            aes(precip_param2, profit, col=temp_param2)) + 
-  geom_point(cex=2) +
-  theme_light() +
-  labs(y="Profit", 
-       x="Precipitation Coefficient")
-
-ggarrange(p1, p2)
-
+# p1 = ggplot(profit_sensitivity, 
+#             aes(temp_param2, profit)) +
+#   geom_point(cex=2) +
+#   theme_light() +
+#   labs(y="Profit", 
+#        x="Temperature Coefficient")
+# 
+# p2 = ggplot(profit_sensitivity, 
+#             aes(precip_param2, profit)) + 
+#   geom_point(cex=2) +
+#   theme_light() +
+#   labs(y="Profit", 
+#        x="Precipitation Coefficient")
+# 
+# ggarrange(p1, p2)
 ```
 
 ```{r}
@@ -195,5 +194,14 @@ ggplot(profit_sensitivity, aes(x=almond_yield, y=profit)) +
   labs(x="Almond Yield", 
        y="Profit",
        title="Relationship Between Profit and Almond Yield")
+```
+
+```{r}
+ggplot(profit_sensitivity, aes(x=factor(year), y=profit, group=year)) +
+  geom_boxplot() +
+  theme_light() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(x="Year", y="Profit",
+       title="Yearly Profit Distribution From Almond Yield Parameter Uncertainty")
 ```
 
