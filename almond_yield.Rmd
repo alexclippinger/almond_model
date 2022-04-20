@@ -192,16 +192,16 @@ ggplot(profit_sensitivity, aes(x=almond_yield, y=profit)) +
   geom_point() +
   theme_light() +
   labs(x="Almond Yield", 
-       y="Profit",
+       y="Profit ($/acre)",
        title="Relationship Between Profit and Almond Yield")
 ```
 
 ```{r}
-ggplot(profit_sensitivity, aes(x=factor(year), y=profit, group=year)) +
+profit_sensitivity %>% filter(year != 1995) %>% ggplot(aes(x=factor(year), y=profit, group=year)) +
   geom_boxplot() +
   theme_light() +
   theme(axis.text.x = element_text(angle=90)) +
-  labs(x="Year", y="Profit",
+  labs(x="Year", y="Profit ($/acre)",
        title="Yearly Profit Distribution From Almond Yield Parameter Uncertainty")
 ```
 

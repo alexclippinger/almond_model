@@ -7,7 +7,7 @@
 #' @param cost_per_acre average operational costs per acre
 #' @param price_per_lb average price of almonds per lb
 #'
-#' @return a dataframe appended with the profit results for a given yield anomaly
+#' @return a dataframe appended with the profit results ($/acre) for a given yield anomaly
 #'
 #' source: relationship of yield anomaly to price anomaly derived from Lobell et. al. 2006, Table 5
 profit_model <- function(
