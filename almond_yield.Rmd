@@ -93,7 +93,7 @@ Our findings demonstrate four years of almond yields below the anomaly (1989, 19
 ## Compute Simple Profit Model
 
 ```{r}
-profit <- profit_model(yield_results = model_results, price =  10)
+profit <- profit_model(yield_results = model_results)
 
 p1 = ggplot(profit, aes(x=year, y=profit)) +
   geom_line() +
@@ -167,7 +167,7 @@ ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
 ## Almond Profit Uncertainty
 
 ```{r}
-profit_sensitivity <- profit_model(yield_results = mean_yield, price = 10)
+profit_sensitivity <- profit_model(yield_results = mean_yield)
 
 # Plot results
 p1 = ggplot(profit_sensitivity, 
