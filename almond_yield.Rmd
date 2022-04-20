@@ -92,6 +92,8 @@ Our findings demonstrate four years of almond yields below the anomaly (1989, 19
 
 ## Compute Simple Profit Model
 
+The code below calculates and visualizes profit based on yield results from Assignment 2 using default parameters.
+
 ```{r}
 profit <- profit_model(yield_results = model_results)
 
@@ -110,9 +112,7 @@ ggarrange(p1, p2)
 
 ## Simple Informal Sensitivity Analysis
 
-* Assume uncertainty in *temp_param2* and *precip_param2* parameters
-
-* Default values from the function are -0.0046 and 0.0043, respectively
+The following simple informal sensitivity analysis assumes uncertainty in *temp_param2* and *precip_param2* parameters, with default values from the function -0.0046 and 0.0043, respectively.
 
 ```{r}
 nsamples = 50
@@ -154,6 +154,8 @@ p2 = ggplot(mean_yield,
 ggarrange(p1, p2)
 ```
 
+The parameter combinations used for the sensitivity analysis are plotted below.
+
 ```{r}
 # Investigate parameter space
 ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
@@ -166,26 +168,13 @@ ggplot(mean_yield, aes(x=temp_param2, y=precip_param2)) +
 
 ## Almond Profit Uncertainty
 
+Using the results from the previous section, we can plot yearly profit distribution given parameter uncertainty.
+
 ```{r}
 profit_sensitivity <- profit_model(yield_results = mean_yield)
-
-# Plot results
-# p1 = ggplot(profit_sensitivity, 
-#             aes(temp_param2, profit)) +
-#   geom_point(cex=2) +
-#   theme_light() +
-#   labs(y="Profit", 
-#        x="Temperature Coefficient")
-# 
-# p2 = ggplot(profit_sensitivity, 
-#             aes(precip_param2, profit)) + 
-#   geom_point(cex=2) +
-#   theme_light() +
-#   labs(y="Profit", 
-#        x="Precipitation Coefficient")
-# 
-# ggarrange(p1, p2)
 ```
+
+First, the relationship between profit and almond yield is visualized. Our profit model estimates that as yield increases, profit (in terms of $/acre) will gradually decrease. Theoretically, this is potentially caused by decreased price per unit (i.e. law of demand/supply) and increasing marginal costs of production.
 
 ```{r}
 ggplot(profit_sensitivity, aes(x=almond_yield, y=profit)) +
@@ -196,12 +185,30 @@ ggplot(profit_sensitivity, aes(x=almond_yield, y=profit)) +
        title="Relationship Between Profit and Almond Yield")
 ```
 
+Lastly, we plot yearly profit distribution given parameter uncertainty. In our submitted graph, 1995 is separated due to the large difference in scale.
+
 ```{r}
-profit_sensitivity %>% filter(year != 1995) %>% ggplot(aes(x=factor(year), y=profit, group=year)) +
+p1 <- profit_sensitivity %>% filter(year != 1995) %>% ggplot(aes(x=factor(year), y=profit, group=year)) +
+  geom_boxplot() +
+  theme_light() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(x="Year", y="Profit ($/acre)",
+       title="Yearly Profit Distribution From Almond Yield Parameter Uncertainty",
+       caption="Note: 1995 has been separated due to large difference in scale.")
+p1
+
+ggsave("profit_sensitivity.jpg", p1)
+```
+
+The same plot, with 1995 included, is below.
+
+```{r}
+p2 <- profit_sensitivity %>% ggplot(aes(x=factor(year), y=profit, group=year)) +
   geom_boxplot() +
   theme_light() +
   theme(axis.text.x = element_text(angle=90)) +
   labs(x="Year", y="Profit ($/acre)",
        title="Yearly Profit Distribution From Almond Yield Parameter Uncertainty")
+p2
 ```
 
